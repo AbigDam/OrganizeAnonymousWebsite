@@ -32,7 +32,7 @@ HTML_TEMPLATE = '''
 <h4>1. Go to google classroom assignemnt</h4> <img src = "https://assets.onecompiler.app/439vx5wbx/3x2zp2yd7/image_2025-03-26_012550996.png">
 <h4>2. Click on student work</h4> <img src = "https://assets.onecompiler.app/439vx5wbx/3x2zp2yd7/image_2025-03-26_012620267.png">
 <h4>3. Click on the folder icon, below "accepting submissions"</h4> <img src = "https://assets.onecompiler.app/439vx5wbx/3x2zp2yd7/image_2025-03-26_012643368.png">
-<h4>4. Download the google drive folder </h4> <img src = "https://assets.onecompiler.app/439vx5wbx/3x2zp2yd7/image_2025-03-26_012708255.png">
+<h4>4. Download the google drive folder </h4> <img src = "https://assets.onecompiler.app/439vx5wbx/3x2zp2yd7/image_2025-03-26_015144090.png">
 
 <h4>5. Repeat for another google classroom assignment</h4>
 
