@@ -25,6 +25,21 @@ HTML_TEMPLATE = '''
 </head>
 <body>
     <h1>Essay Processor</h1>
+
+
+<h3> Steps to submitting essays: </h3>
+
+<h4>1. Go to google classroom assignemnt</h4> <img src = "https://assets.onecompiler.app/439vx5wbx/3x2zp2yd7/image_2025-03-26_012550996.png">
+<h4>2. Click on student work</h4> <img src = "https://assets.onecompiler.app/439vx5wbx/3x2zp2yd7/image_2025-03-26_012620267.png">
+<h4>3. Click on the folder icon, below "accepting submissions"</h4> <img src = "https://assets.onecompiler.app/439vx5wbx/3x2zp2yd7/image_2025-03-26_012643368.png">
+<h4>4. Download the google drive folder </h4> <img src = "https://assets.onecompiler.app/439vx5wbx/3x2zp2yd7/image_2025-03-26_012708255.png">
+
+<h4>5. Repeat for another google classroom assignment</h4>
+
+<h4>6. Attatch both folders here and press "process essays" </h4>
+
+<h4>7. Copy and paste the generated text and email it to my email!  Thanks!</h4>
+
     <div class="form-container">
         <form method="post" enctype="multipart/form-data">
             <div>
@@ -32,7 +47,12 @@ HTML_TEMPLATE = '''
                 <textarea name="strings" rows="5" required></textarea>
             </div>
             <div>
-                <input type="file" name="zipfile" accept=".zip" required title="Upload a ZIP file containing PDF and/or DOCX files">
+                <label>First ZIP file:</label><br>
+                <input type="file" name="zipfile1" accept=".zip" required title="Upload first ZIP file containing PDF and/or DOCX files">
+            </div>
+            <div>
+                <label>Second ZIP file:</label><br>
+                <input type="file" name="zipfile2" accept=".zip" required title="Upload second ZIP file containing PDF and/or DOCX files">
             </div>
             <button type="submit">Process Essays</button>
         </form>
@@ -51,41 +71,47 @@ HTML_TEMPLATE = '''
 def upload_file():
     result = None
     if request.method == 'POST':
-        if 'zipfile' not in request.files or 'strings' not in request.form:
-            return 'Please provide both ZIP file and strings'
+        if 'zipfile1' not in request.files or 'zipfile2' not in request.files or 'strings' not in request.form:
+            return 'Please provide both ZIP files and strings'
 
         strings = request.form['strings'].split('\n')
         strings = [s.strip() for s in strings if s.strip()]
         if not strings:
             return 'Please enter at least one string'
 
-        print(strings)
-        file = request.files['zipfile']
-        if file.filename == '':
-            return 'No file selected'
+        file1 = request.files['zipfile1']
+        file2 = request.files['zipfile2']
+        
+        if file1.filename == '' or file2.filename == '':
+            return 'Please select both ZIP files'
 
-        if file and file.filename and file.filename.endswith('.zip'):
-            filename = secure_filename(file.filename)
+        if file1.filename.endswith('.zip') and file2.filename.endswith('.zip'):
             temp_dir = 'temp_uploads'
 
             # Create temp directory if it doesn't exist
             if not os.path.exists(temp_dir):
                 os.makedirs(temp_dir)
 
-            zip_path = os.path.join(temp_dir, filename)
-            file.save(zip_path)
-
-            # Extract and process files
+            # Extract and process files from both ZIPs
             extracted_files = []
-            with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-                # Get list of PDF, DOCX and GDOC files from zip
-                extracted_files = [
-                    f for f in zip_ref.namelist()
-                    if f.endswith(('.pdf', '.docx', '.gdoc'))
-                ]
-                # Extract files
-                for doc_file in extracted_files:
+            
+            # Process first ZIP
+            zip_path1 = os.path.join(temp_dir, secure_filename(file1.filename))
+            file1.save(zip_path1)
+            with zipfile.ZipFile(zip_path1, 'r') as zip_ref:
+                files1 = [f for f in zip_ref.namelist() if f.endswith(('.pdf', '.docx', '.gdoc'))]
+                for doc_file in files1:
                     zip_ref.extract(doc_file, temp_dir)
+                extracted_files.extend(files1)
+            
+            # Process second ZIP
+            zip_path2 = os.path.join(temp_dir, secure_filename(file2.filename))
+            file2.save(zip_path2)
+            with zipfile.ZipFile(zip_path2, 'r') as zip_ref:
+                files2 = [f for f in zip_ref.namelist() if f.endswith(('.pdf', '.docx', '.gdoc'))]
+                for doc_file in files2:
+                    zip_ref.extract(doc_file, temp_dir)
+                extracted_files.extend(files2)
 
             # Read file contents and process them
             try:
@@ -152,7 +178,7 @@ def process_pdfs(strings, pdf_contents):
         result_text = result_text.replace(name, number)
 
     result_text = result_text.replace("\n", " ")
-    result_text = result_text.replace(" ##", " \n ##")
+    result_text = result_text.replace(" ##", " \n \n ##")
 
     return result_text
 
